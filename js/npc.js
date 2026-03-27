@@ -17,7 +17,7 @@ const NPC = (() => {
     if (!waypoints || waypoints.length < 2) return;
 
     // NPC mathematically scales with player, but slightly throttled for fairness
-    const levelSpeedBonus = level.id * 0.03;
+    const levelSpeedBonus = level.id * 0.02;
     const baseTopSpeed    = level.npcSpeed * 420; 
     const npcSpeedPx      = baseTopSpeed * (1 + levelSpeedBonus);
     
