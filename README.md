@@ -6,7 +6,7 @@
 
 Master the momentum-based drifting physics, razor-thin braking zones, and perfect your racing lines to shave off milliseconds.
 
-🏎️ **[Play Duel Racer Live Here!](#)** *(Link coming soon)*
+🏎️ **[Play Duel Racer Live Here!](https://duelracer.netlify.app/)**  *(Beat Level 10… if you can)*
 
 ---
 
