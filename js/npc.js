@@ -16,7 +16,11 @@ const NPC = (() => {
   function update(npcState, waypoints, level, dt) {
     if (!waypoints || waypoints.length < 2) return;
 
-    const npcSpeedPx = level.npcSpeed * 380;   // px/s top speed for NPC
+    // NPC mathematically scales with player, but slightly throttled for fairness
+    const levelSpeedBonus = level.id * 0.03;
+    const baseTopSpeed    = level.npcSpeed * 420; 
+    const npcSpeedPx      = baseTopSpeed * (1 + levelSpeedBonus);
+    
     const mistakeRate = level.npcMistake;       // probability per second
 
     // ── Mistake system (lower levels NPC wobbles occasionally)
@@ -39,8 +43,8 @@ const NPC = (() => {
     const dist = Math.sqrt(dx * dx + dy * dy);
     const targetAngle = Math.atan2(dy, dx);
 
-    // Advance waypoint when close enough
-    if (dist < 24) {
+    // Advance waypoint when close enough (expanded radius for high speed drifting)
+    if (dist < 45) {
       npcState.waypointIdx = (npcState.waypointIdx + 1) % waypoints.length;
     }
 
@@ -49,7 +53,8 @@ const NPC = (() => {
     while (angleDiff >  Math.PI) angleDiff -= Math.PI * 2;
     while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
 
-    const turnSpeed = 3.0;
+    // Scale turn speed heavily by level so they can navigate brutal hairpins at 400px/s
+    const turnSpeed = 3.5 + (level.id * 0.8); 
     npcState.angle += (angleDiff * turnSpeed + npcState.mistakeDir) * dt;
 
     // Speed management — slow down in tight corners
@@ -57,7 +62,7 @@ const NPC = (() => {
     const cornerSpeedMult = 1 - cornerSeverity * 0.40;
     const targetSpeed = npcSpeedPx * cornerSpeedMult;
 
-    const accelRate = 180;
+    const accelRate = 120 + (level.npcSpeed * 250); // Scales acceleration with late game difficulty
     if (npcState.speed < targetSpeed) {
       npcState.speed = Math.min(npcState.speed + accelRate * dt, targetSpeed);
     } else {

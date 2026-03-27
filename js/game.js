@@ -134,7 +134,7 @@ const Game = (() => {
     // Find closest waypoint ahead
     let minDist  = Infinity;
     let bestIdx  = lapState.waypointIdx;
-    const search = Math.min(8, wp.length);
+    const search = Math.min(15, wp.length); // Expanded to 15 waypoints deep to safely catch 450px/s speeds
     for (let i = 0; i < search; i++) {
       const idx = (lapState.waypointIdx + i) % wp.length;
       const w   = wp[idx];

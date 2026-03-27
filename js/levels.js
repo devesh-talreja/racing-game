@@ -56,17 +56,24 @@ const LEVELS = [
   },
   {
     id: 7, name: 'Binary Orbit',     theme: '#fcd34d', difficulty: 5,
-    npcSpeed: 0.62, npcMistake: 0.02,
+    npcSpeed: 0.68, npcMistake: 0.02,
     trackWidth: 110,
     bgColor: '#191505', roadColor: '#28200a', kerb1: '#fcd34d', kerb2: '#b45309',
     waypoints: alignTrackStart(buildClover(400, 300, 60, 2, Math.PI / 2)), // 2-leaf pinched oval rotated natively
   },
   {
     id: 8, name: 'Velocity Box',     theme: '#10b981', difficulty: 6,
-    npcSpeed: 0.65, npcMistake: 0.015,
+    npcSpeed: 0.72, npcMistake: 0.015,
     trackWidth: 105,
     bgColor: '#051810', roadColor: '#0a2318', kerb1: '#10b981', kerb2: '#047857',
     waypoints: alignTrackStart(buildRoundedRect(120, 80, 680, 520, 60)), // Massive straightaways with tight 60px corners
+  },
+  {
+    id: 9, name: 'Nebula Star',      theme: '#eab308', difficulty: 7,
+    npcSpeed: 0.78, npcMistake: 0.012,
+    trackWidth: 100,
+    bgColor: '#161208', roadColor: '#261f0f', kerb1: '#eab308', kerb2: '#a16207',
+    waypoints: alignTrackStart(buildClover(400, 300, 55, 5, Math.PI)), // Massive 5-leaf sweeping star
   }
 ];
 
