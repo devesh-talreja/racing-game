@@ -22,6 +22,8 @@
         <button class="btn btn-secondary" id="btn-cars">Select Car</button>
         <button class="btn btn-secondary" id="btn-levels">Select Level</button>
         <button class="btn btn-secondary" id="btn-records">Best Times</button>
+        <button class="btn btn-secondary" id="btn-settings">Settings</button>
+        <br><br>
         <button class="btn btn-ghost" id="btn-controls">Controls</button>
       </nav>
     </div>
@@ -165,6 +167,45 @@
         <h3>Goal</h3>
         <p>Complete a lap of the track before the NPC to win. Each level features a unique circuit with increasing difficulty. Beat your best times to set new records!</p>
       </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS SCREEN -->
+  <section id="screen-settings" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="settings-back">← Back</button>
+      <h2>Game Settings</h2>
+    </div>
+    <div class="settings-content">
+      <div class="settings-card">
+        <label>Steering Sensitivity</label>
+        <div class="slider-row">
+          <input type="range" id="range-steer" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="slider-val" id="val-steer">1.0x</span>
+        </div>
+        <p class="settings-desc">Higher values make the car turn sharper.</p>
+      </div>
+
+      <div class="settings-card">
+        <label>Acceleration Sensitivity</label>
+        <div class="slider-row">
+          <input type="range" id="range-accel" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="slider-val" id="val-accel">1.0x</span>
+        </div>
+        <p class="settings-desc">Higher values make the car reach top speed faster.</p>
+      </div>
+
+      <div class="settings-card">
+        <label>Braking Power</label>
+        <div class="slider-row">
+          <input type="range" id="range-brake" min="0.5" max="2.0" step="0.1" value="1.0">
+          <span class="slider-val" id="val-brake">1.0x</span>
+        </div>
+        <p class="settings-desc">Higher values make the car stop abruptly.</p>
+      </div>
+    </div>
+    <div class="screen-footer">
+      <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
     </div>
   </section>
 

@@ -21,35 +21,56 @@ const Physics = (() => {
   const BRAKE_FORCE = 340;   // px/s²
 
   function createCarState(x, y, angle) {
-    return { x, y, angle, speed: 0, vx: 0, vy: 0 };
+    return { x, y, angle, speed: 0, steer: 0, vx: 0, vy: 0 };
   }
 
   function update(state, car, input, dt, levelSpeedBonus = 0) {
+    // Merge user sensitivities dynamically
+    const settings = Storage.getSettings ? Storage.getSettings() : { steerSens: 1.0, accelSens: 1.0, brakeSens: 1.0 };
+    
     const ms  = maxSpeed(car) * (1 + levelSpeedBonus * 0.04);
-    const ar  = accelRate(car);
-    const tr  = turnRate(car);
+    const ar  = accelRate(car) * settings.accelSens;
+    const tr  = turnRate(car) * settings.steerSens;
+    const brForce = BRAKE_FORCE * settings.brakeSens;
 
-    // Acceleration / Brake
+    // Smooth Acceleration / Coasting / Braking
     if (input.accel) {
-      state.speed = Math.min(state.speed + ar * dt, ms);
+      // Softer start at low speeds
+      const accelMulti = Math.abs(state.speed) < (ms * 0.3) ? 0.65 : 1.0; 
+      state.speed = Math.min(state.speed + ar * accelMulti * dt, ms);
     } else if (input.brake) {
       if (state.speed > 0) {
-        state.speed = Math.max(state.speed - BRAKE_FORCE * dt, 0);
+        state.speed = Math.max(state.speed - brForce * dt, 0);
       } else {
-        // Reverse (limited)
+        // Reverse
         state.speed = Math.max(state.speed - ar * 0.5 * dt, -ms * 0.3);
       }
     } else {
-      // Friction / drag
-      state.speed *= Math.pow(FRICTION, dt * 60);
+      // Coasting drag - smoother than old hard friction
+      state.speed *= Math.pow(0.98, dt * 60);
     }
 
-    // Steering — only effective when moving
-    const speedFactor = Math.abs(state.speed) / ms;
+    // Smooth Steering (momentum)
+    const steerAccel = tr * 4.0;
+    const steerDecel = tr * 6.0;
+    
+    if (input.left)  state.steer -= steerAccel * dt;
+    else if (input.right) state.steer += steerAccel * dt;
+    else {
+      // Auto-center steering smoothly
+      if (state.steer > 0) state.steer = Math.max(0, state.steer - steerDecel * dt);
+      if (state.steer < 0) state.steer = Math.min(0, state.steer + steerDecel * dt);
+    }
+    
+    // Clamp steer to max capabilities
+    state.steer = Math.max(-tr, Math.min(tr, state.steer));
+
+    // Apply steering angle (dependent on current speed to prevent spinning in place)
     if (Math.abs(state.speed) > 5) {
+      const speedFactor = Math.abs(state.speed) / (ms * 0.85); 
+      const grip = Math.min(speedFactor, 1.2); 
       const dir = state.speed >= 0 ? 1 : -1;
-      if (input.left)  state.angle -= tr * speedFactor * dt * dir;
-      if (input.right) state.angle += tr * speedFactor * dt * dir;
+      state.angle += state.steer * grip * dt * dir;
     }
 
     // Velocity integration

@@ -8,105 +8,106 @@ const LEVELS = [
   {
     id: 0, name: 'City Road',        theme: '#4f8ef7', difficulty: 1,
     npcSpeed: 0.38, npcMistake: 0.06,
-    trackWidth: 80,
+    trackWidth: 130,
     bgColor: '#1a2035', roadColor: '#2a3050', kerb1: '#f7f7f7', kerb2: '#e05555',
-    waypoints: buildOval(400, 300, 300, 180),
+    // Offset by PI/2 starts at the bottom edge, going left.
+    waypoints: buildOval(400, 300, 300, 180, false, Math.PI / 2),
   },
   {
     id: 1, name: 'Suburban Track',   theme: '#7b5cf0', difficulty: 1,
     npcSpeed: 0.41, npcMistake: 0.055,
-    trackWidth: 75,
+    trackWidth: 130,
     bgColor: '#1a2225', roadColor: '#283035', kerb1: '#f0f0f0', kerb2: '#4f8ef7',
     waypoints: buildRoundedRect(80, 80, 720, 520, 80),
   },
   {
     id: 2, name: 'Night Road',       theme: '#2d1b69', difficulty: 1,
     npcSpeed: 0.44, npcMistake: 0.05,
-    trackWidth: 72,
+    trackWidth: 130,
     bgColor: '#0a0a18', roadColor: '#1a1a2e', kerb1: '#ffe066', kerb2: '#222250',
     waypoints: buildFigureEight(400, 300, 220, 150),
   },
   {
     id: 3, name: 'Highway Loop',     theme: '#22c55e', difficulty: 2,
     npcSpeed: 0.47, npcMistake: 0.045,
-    trackWidth: 90,
+    trackWidth: 130,
     bgColor: '#0f1f10', roadColor: '#1a2e1a', kerb1: '#ffffff', kerb2: '#22c55e',
-    waypoints: buildOval(400, 300, 340, 220),
+    waypoints: buildOval(400, 300, 340, 220, false, Math.PI / 2),
   },
   {
     id: 4, name: 'Tunnel Section',   theme: '#fbbf24', difficulty: 2,
     npcSpeed: 0.50, npcMistake: 0.04,
-    trackWidth: 68,
+    trackWidth: 130,
     bgColor: '#1a1205', roadColor: '#2a2010', kerb1: '#fbbf24', kerb2: '#92400e',
     waypoints: buildSnake(400, 300, 300, 160, 4),
   },
   {
     id: 5, name: 'Urban Turns',      theme: '#f87171', difficulty: 2,
     npcSpeed: 0.52, npcMistake: 0.035,
-    trackWidth: 70,
+    trackWidth: 130,
     bgColor: '#1a1015', roadColor: '#251520', kerb1: '#f87171', kerb2: '#7f1d1d',
     waypoints: buildRoundedRect(90, 90, 710, 510, 50),
   },
   {
     id: 6, name: 'Bridge Track',     theme: '#38bdf8', difficulty: 3,
     npcSpeed: 0.54, npcMistake: 0.03,
-    trackWidth: 66,
+    trackWidth: 130,
     bgColor: '#051520', roadColor: '#0a2030', kerb1: '#38bdf8', kerb2: '#0369a1',
     waypoints: buildFigureEight(400, 300, 250, 170),
   },
   {
     id: 7, name: 'Industrial Route', theme: '#fb923c', difficulty: 3,
     npcSpeed: 0.56, npcMistake: 0.025,
-    trackWidth: 64,
+    trackWidth: 130,
     bgColor: '#1a1205', roadColor: '#241a08', kerb1: '#fb923c', kerb2: '#7c2d12',
     waypoints: buildSnake(400, 300, 320, 180, 5),
   },
   {
     id: 8, name: 'Rainy Road',       theme: '#94a3b8', difficulty: 3,
     npcSpeed: 0.58, npcMistake: 0.02,
-    trackWidth: 62,
+    trackWidth: 130,
     bgColor: '#111620', roadColor: '#1e2535', kerb1: '#94a3b8', kerb2: '#334155',
-    waypoints: buildOval(400, 300, 320, 200, true),
+    waypoints: buildOval(400, 300, 320, 200, true, Math.PI / 2),
   },
   {
     id: 9, name: 'Coastal Road',     theme: '#06b6d4', difficulty: 4,
     npcSpeed: 0.60, npcMistake: 0.018,
-    trackWidth: 60,
+    trackWidth: 130,
     bgColor: '#051018', roadColor: '#0a1525', kerb1: '#06b6d4', kerb2: '#164e63',
     waypoints: buildCoastal(),
   },
   {
     id: 10, name: 'Mountain Road',   theme: '#a8a29e', difficulty: 4,
     npcSpeed: 0.62, npcMistake: 0.015,
-    trackWidth: 58,
+    trackWidth: 130,
     bgColor: '#12100e', roadColor: '#1c1814', kerb1: '#d6d3d1', kerb2: '#57534e',
     waypoints: buildMountain(),
   },
   {
     id: 11, name: 'Neon City',       theme: '#e879f9', difficulty: 4,
     npcSpeed: 0.64, npcMistake: 0.013,
-    trackWidth: 56,
+    trackWidth: 130,
     bgColor: '#100a1a', roadColor: '#1a1028', kerb1: '#e879f9', kerb2: '#86198f',
     waypoints: buildFigureEight(400, 300, 280, 190),
   },
   {
     id: 12, name: 'Tight Circuit',   theme: '#f59e0b', difficulty: 5,
     npcSpeed: 0.66, npcMistake: 0.010,
-    trackWidth: 54,
+    trackWidth: 130,
     bgColor: '#1a1000', roadColor: '#281800', kerb1: '#f59e0b', kerb2: '#92400e',
     waypoints: buildRoundedRect(110, 110, 690, 490, 30),
   },
   {
     id: 13, name: 'City Highway',    theme: '#818cf8', difficulty: 5,
     npcSpeed: 0.69, npcMistake: 0.008,
-    trackWidth: 52,
+    trackWidth: 130,
     bgColor: '#080c20', roadColor: '#101830', kerb1: '#818cf8', kerb2: '#312e81',
     waypoints: buildSnake(400, 300, 340, 200, 6),
   },
   {
     id: 14, name: 'Championship',    theme: '#fbbf24', difficulty: 5,
     npcSpeed: 0.73, npcMistake: 0.005,
-    trackWidth: 50,
+    trackWidth: 130,
     bgColor: '#0a0800', roadColor: '#181200', kerb1: '#fbbf24', kerb2: '#b45309',
     waypoints: buildChampionship(),
   },
@@ -114,11 +115,11 @@ const LEVELS = [
 
 // ─── Track Generator Helpers ──────────────────────────────────
 
-function buildOval(cx, cy, rx, ry, wobble = false) {
+function buildOval(cx, cy, rx, ry, wobble = false, angleOffset = 0) {
   const pts = [];
   const steps = 40;
   for (let i = 0; i < steps; i++) {
-    const a = (i / steps) * Math.PI * 2;
+    const a = (i / steps) * Math.PI * 2 + angleOffset;
     const wx = wobble ? Math.sin(a * 3) * 18 : 0;
     const wy = wobble ? Math.cos(a * 5) * 12 : 0;
     pts.push({ x: cx + Math.cos(a) * rx + wx, y: cy + Math.sin(a) * ry + wy });

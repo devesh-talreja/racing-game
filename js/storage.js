@@ -29,5 +29,7 @@ const Storage = (() => {
     },
     getRecord:         (lvl)   => get('record_' + lvl, null),
     setRecord:         (lvl, t)=> set('record_' + lvl, t),
+    getSettings:       ()      => get('sys_settings', { steerSens: 1.0, accelSens: 1.0, brakeSens: 1.0 }),
+    setSettings:       (obj)   => set('sys_settings', obj),
   };
 })();

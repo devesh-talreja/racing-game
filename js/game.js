@@ -101,11 +101,9 @@ const Game = (() => {
     // Player physics
     if (!playerLap.finished) {
       Physics.update(player, currentCar, input, dt, currentLevel.id);
-      // Track boundary: clamp player to track (basic - keep near waypoints)
       clampToTrack(player, currentLevel.waypoints, currentLevel.trackWidth);
       updateProgress(player, playerLap, currentLevel.waypoints);
-      if (playerLap.progress >= 1.0 && !playerLap.finished) {
-        playerLap.finished = true;
+      if (playerLap.finished && playerLap.time === 0) {
         playerLap.time = raceElapsed;
         checkRaceEnd(timestamp);
       }
@@ -115,15 +113,19 @@ const Game = (() => {
     if (!npcLap.finished) {
       NPC.update(npc, currentLevel.waypoints, currentLevel, dt);
       updateProgress(npc, npcLap, currentLevel.waypoints);
-      if (npcLap.progress >= 1.0 && !npcLap.finished) {
-        npcLap.finished = true;
+      if (npcLap.finished && npcLap.time === 0) {
         npcLap.time = raceElapsed;
         checkRaceEnd(timestamp);
       }
     }
 
     updateHUD();
-    renderFrame();
+    try {
+      renderFrame();
+    } catch (e) {
+      state = State.FINISHED; // stop loop to prevent alert spam
+      alert("RENDER ENGINE CRASH:\n" + e.message);
+    }
   }
 
   // ─── Progress Tracking ─────────────────────────────────────
@@ -142,21 +144,22 @@ const Game = (() => {
       if (d < minDist) { minDist = d; bestIdx = idx; }
     }
 
-    if (Math.sqrt(minDist) < 40) {
+    // Increased from 40 to 180 to account for trackWidth=130 and drifting
+    if (Math.sqrt(minDist) < 180) {
       const prev = lapState.waypointIdx;
-      if (bestIdx !== prev) lapState.waypointIdx = bestIdx;
+      if (bestIdx !== prev) {
+        // Did we wrap around over the array boundary?
+        // Since we only search 8 points forward, if bestIdx is smaller than prev, it MUST be a wrap-around!
+        if (bestIdx < prev) {
+          lapState.finished = true;
+          lapState.progress = 1.0;
+        }
+        lapState.waypointIdx = bestIdx;
+      }
     }
 
-    lapState.progress = lapState.waypointIdx / wp.length;
-    // Detect finish (crossed past last waypoint back to 0)
-    if (lapState.waypointIdx === wp.length - 1) {
-      const lastWP  = wp[wp.length - 1];
-      const firstWP = wp[0];
-      const dx = carState.x - firstWP.x;
-      const dy = carState.y - firstWP.y;
-      if (Math.sqrt(dx * dx + dy * dy) < 50) {
-        lapState.progress = 1.0;
-      }
+    if (!lapState.finished) {
+      lapState.progress = lapState.waypointIdx / wp.length;
     }
   }
 
@@ -170,16 +173,17 @@ const Game = (() => {
       const d  = Math.sqrt(dx * dx + dy * dy);
       if (d < minDist) { minDist = d; nearX = wp.x; nearY = wp.y; }
     }
-    const limit = trackWidth / 2 + 2;
+    const limit = trackWidth / 2; // softer boundary
     if (minDist > limit) {
       // Push back toward track center
       const dx = nearX - carState.x;
       const dy = nearY - carState.y;
       const mag = Math.sqrt(dx * dx + dy * dy);
       const over = minDist - limit;
-      carState.x += (dx / mag) * over * 0.8;
-      carState.y += (dy / mag) * over * 0.8;
-      carState.speed *= 0.7; // collision penalty
+      carState.x += (dx / mag) * over * 0.9;
+      carState.y += (dy / mag) * over * 0.9;
+      // Soft drift penalty instead of harsh stop
+      carState.speed *= 0.92;
     }
   }
 
@@ -226,10 +230,13 @@ const Game = (() => {
 
   // ─── Render ────────────────────────────────────────────────
   function renderFrame() {
+    if (!Renderer) throw new Error("Renderer object is undefined");
+    if (!currentLevel) throw new Error("currentLevel is undefined");
+    
     Renderer.clear();
     Renderer.drawTrack(currentLevel);
     Renderer.drawStartLine(currentLevel);
-    if (npc)    Renderer.drawCar(npc,    { bodyColor: '#f87171', windshieldColor: '#7f1d1d' });
+    if (npc)    Renderer.drawCar(npc,    { bodyColor: '#a855f7', windshieldColor: '#3b0764', detailsColor: '#fff' });
     if (player) Renderer.drawCar(player, currentCar, 1);
   }
 

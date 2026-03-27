@@ -30,8 +30,14 @@
 /* ─── Base Reset ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
+html {
+  display: flex; justify-content: center; align-items: center;
+  min-height: 100vh; background: #000;
+}
+
+body {
   width: 800px; height: 600px;
+  position: relative;
   overflow: hidden;
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg);
@@ -39,11 +45,13 @@ html, body {
   font-size: 14px;
   line-height: 1.5;
   user-select: none;
+  box-shadow: 0 0 40px rgba(0,0,0,0.8);
+  border-radius: 4px;
 }
 
 /* ─── Screen Management ──────────────────────────────────── */
 .screen {
-  position: absolute; inset: 0;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
   transition: opacity var(--transition);
@@ -188,7 +196,7 @@ html, body {
   background: #000; position: relative; overflow: hidden;
 }
 #race-canvas {
-  position: absolute; inset: 0; width: 100%; height: 100%;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   display: block;
 }
 .race-hud {
@@ -361,8 +369,33 @@ kbd {
 }
 .controls-group p { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
 
+/* ─── SETTINGS SCREEN ────────────────────────────────────── */
+#screen-settings { background: var(--bg); }
+.settings-content {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;
+  padding: 20px 24px;
+}
+.settings-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.settings-card label { font-size: 14px; font-weight: 700; color: var(--accent); }
+.settings-desc { font-size: 11px; color: var(--text-dim); }
+.slider-row { display: flex; align-items: center; gap: 16px; }
+.slider-row input[type=range] { flex: 1; margin: 0; outline: none; }
+.slider-val { font-family: monospace; font-weight: 800; font-size: 16px; width: 40px; text-align: right; }
+
 /* ─── Scrollbar ──────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ─── Keyboard Focus ─────────────────────────────────────── */
+.keyboard-focus {
+  outline: 3px solid var(--accent) !important;
+  outline-offset: 3px;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(79,142,247,0.3);
+}

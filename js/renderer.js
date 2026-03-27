@@ -12,15 +12,16 @@ const Renderer = (() => {
   }
 
   function resize() {
-    canvas.width  = canvas.offsetWidth  || 800;
-    canvas.height = canvas.offsetHeight || 556; // 600 - HUD height ~44px
+    // Hardcoded to prevent CSS 'display' collapsing the pixel buffer size
+    canvas.width  = 800;
+    canvas.height = 600;
   }
 
   // ─── Scale helpers ─────────────────────────────────────────
   // We design tracks on a 800×600 virtual canvas, scale to actual.
   function sx(x) { return x * (canvas.width  / 800); }
-  function sy(y) { return y * (canvas.height / 556); }
-  function ss(v) { return v * Math.min(canvas.width / 800, canvas.height / 556); }
+  function sy(y) { return y * (canvas.height / 600); }
+  function ss(v) { return v * Math.min(canvas.width / 800, canvas.height / 600); }
 
   // ─── Draw Track ────────────────────────────────────────────
   function drawTrack(level) {
@@ -29,13 +30,13 @@ const Renderer = (() => {
     const tw = ss(level.trackWidth);
 
     // Background
-    ctx.fillStyle = level.bgColor;
+    ctx.fillStyle = level.bgColor || '#1a2035';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Draw outer road shadow
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.6)';
-    ctx.shadowBlur  = 18;
+    // ctx.shadowColor = 'rgba(0,0,0,0.6)'; // Disabled for better performance and to avoid context loss
+    // ctx.shadowBlur  = 18;
 
     // Road fill (thick stroked path)
     ctx.beginPath();
@@ -56,7 +57,7 @@ const Renderer = (() => {
     const kerbDash  = ss(18);
     ctx.setLineDash([kerbDash, kerbDash]);
     ctx.lineDashOffset = 0;
-    ctx.strokeStyle = level.kerb1;
+    ctx.strokeStyle = level.kerb1 || '#fff';
     ctx.globalAlpha = 0.9;
     ctx.stroke();
     ctx.setLineDash([]);
@@ -68,7 +69,7 @@ const Renderer = (() => {
     ctx.lineWidth   = tw + 8;
     ctx.setLineDash([kerbDash, kerbDash]);
     ctx.lineDashOffset = kerbDash;
-    ctx.strokeStyle = level.kerb2;
+    ctx.strokeStyle = level.kerb2 || '#f00';
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.globalAlpha = 1;
@@ -79,7 +80,7 @@ const Renderer = (() => {
     for (let i = 1; i < wp.length; i++) ctx.lineTo(sx(wp[i].x), sy(wp[i].y));
     ctx.closePath();
     ctx.lineWidth   = tw;
-    ctx.strokeStyle = level.roadColor;
+    ctx.strokeStyle = level.roadColor || '#222';
     ctx.stroke();
 
     // Center dashed line
@@ -129,20 +130,20 @@ const Renderer = (() => {
     // Body
     ctx.fillStyle = carDef.bodyColor;
     ctx.beginPath();
-    ctx.roundRect(-CW / 2, -CH / 2, CW, CH, ss(4));
+    ctx.rect(-CW / 2, -CH / 2, CW, CH);
     ctx.fill();
 
     // Windshield
     ctx.fillStyle = carDef.windshieldColor;
-    ctx.fillRect(-CW * 0.05, -CH * 0.4, CW * 0.32, CH * 0.8);
-
-    // Front indicator
-    ctx.fillStyle = '#fffbe0';
     ctx.beginPath();
-    ctx.arc(CW * 0.44, -CH * 0.28, ss(2.5), 0, Math.PI * 2);
+    ctx.rect(-CW / 4, -CH * 0.35, CW * 0.4, CH * 0.7);
     ctx.fill();
+
+    // Details (lights)
+    ctx.fillStyle = carDef.detailsColor;
     ctx.beginPath();
-    ctx.arc(CW * 0.44,  CH * 0.28, ss(2.5), 0, Math.PI * 2);
+    ctx.rect(CW * 0.35, -CH * 0.4, CW * 0.15, CH * 0.2);
+    ctx.rect(CW * 0.35, CH * 0.2, CW * 0.15, CH * 0.2);
     ctx.fill();
 
     // Direction arrow

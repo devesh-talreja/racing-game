@@ -3,11 +3,57 @@
 
 const UI = (() => {
 
+  // ─── Keyboard Navigation ───────────────────────────────────
+  let currentFocusEls = [];
+  let focusIdx = 0;
+
+  function initKeyboardFocus(selectorsStr) {
+    currentFocusEls.forEach(el => el.classList.remove('keyboard-focus'));
+    if (!selectorsStr) {
+      currentFocusEls = []; return;
+    }
+    currentFocusEls = Array.from(document.querySelectorAll(selectorsStr));
+    focusIdx = 0;
+    updateFocus();
+  }
+
+  function updateFocus() {
+    currentFocusEls.forEach(el => el.classList.remove('keyboard-focus'));
+    if (currentFocusEls.length === 0) return;
+    if (focusIdx < 0) focusIdx = 0;
+    if (focusIdx >= currentFocusEls.length) focusIdx = currentFocusEls.length - 1;
+    const el = currentFocusEls[focusIdx];
+    el.classList.add('keyboard-focus');
+    el.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  }
+
+  function moveFocus(dir) {
+    if (currentFocusEls.length === 0) return;
+    focusIdx += dir;
+    if (focusIdx < 0) focusIdx = currentFocusEls.length - 1;
+    if (focusIdx >= currentFocusEls.length) focusIdx = 0;
+    updateFocus();
+  }
+
+  function clickFocus() {
+    if (currentFocusEls[focusIdx]) currentFocusEls[focusIdx].click();
+  }
+
   // ─── Screen Router ─────────────────────────────────────────
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(id);
     if (target) target.classList.add('active');
+
+    // setup keyboard focus targets
+    if (id === 'screen-home') initKeyboardFocus('#screen-home .btn');
+    else if (id === 'screen-cars') initKeyboardFocus('#cars-back, .car-card, #cars-confirm');
+    else if (id === 'screen-levels') initKeyboardFocus('#levels-back, .level-card:not(.locked), #levels-confirm');
+    else if (id === 'screen-results') initKeyboardFocus('.results-actions .btn');
+    else if (id === 'screen-records') initKeyboardFocus('#records-back');
+    else if (id === 'screen-controls') initKeyboardFocus('#controls-back');
+    else if (id === 'screen-settings') initKeyboardFocus('#settings-back, #btn-save-settings');
+    else initKeyboardFocus('');
   }
 
   // ─── Format time ───────────────────────────────────────────
@@ -28,13 +74,14 @@ const UI = (() => {
     // Body
     ctx.fillStyle = car.bodyColor;
     ctx.beginPath();
-    ctx.roundRect(w * 0.1, h * 0.2, w * 0.8, h * 0.6, 6);
+    ctx.rect(w * 0.1, h * 0.2, w * 0.8, h * 0.6);
     ctx.fill();
 
     // Windshield
     ctx.fillStyle = car.windshieldColor;
-    ctx.fillRect(w * 0.45, h * 0.28, w * 0.25, h * 0.44);
-
+    ctx.beginPath();
+    ctx.rect(w * 0.3, h * 0.25, w * 0.4, h * 0.5);
+    ctx.fill();
     // Headlights
     ctx.fillStyle = '#fffbe0';
     ctx.beginPath(); ctx.arc(w * 0.88, h * 0.32, 3, 0, Math.PI * 2); ctx.fill();
@@ -195,5 +242,5 @@ const UI = (() => {
     showScreen('screen-results');
   }
 
-  return { showScreen, renderCarCards, renderLevelGrid, renderRecords, showResults, fmtTime };
+  return { showScreen, renderCarCards, renderLevelGrid, renderRecords, showResults, fmtTime, initKeyboardFocus, moveFocus, clickFocus };
 })();

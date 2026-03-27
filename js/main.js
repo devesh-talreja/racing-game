@@ -14,22 +14,61 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-cars').addEventListener('click', () => {
-    UI.renderCarCards(selectedCarId);
+    UI.renderCarCards(CARS, selectedCarId);
     UI.showScreen('screen-cars');
   });
 
   document.getElementById('btn-levels').addEventListener('click', () => {
-    UI.renderLevelGrid(selectedLevelId, unlockedLevel);
+    UI.renderLevelGrid(LEVELS, unlockedLevel, selectedLevelId);
     UI.showScreen('screen-levels');
   });
 
   document.getElementById('btn-records').addEventListener('click', () => {
-    UI.renderRecords();
+    UI.renderRecords(LEVELS);
     UI.showScreen('screen-records');
   });
 
   document.getElementById('btn-controls').addEventListener('click', () => {
     UI.showScreen('screen-controls');
+  });
+
+  // ─── Settings ──────────────────────────────────────────────
+  const elSteer = document.getElementById('range-steer');
+  const elAccel = document.getElementById('range-accel');
+  const elBrake = document.getElementById('range-brake');
+  
+  function updateSettingsUI() {
+    if(elSteer) document.getElementById('val-steer').textContent = parseFloat(elSteer.value).toFixed(1) + 'x';
+    if(elAccel) document.getElementById('val-accel').textContent = parseFloat(elAccel.value).toFixed(1) + 'x';
+    if(elBrake) document.getElementById('val-brake').textContent = parseFloat(elBrake.value).toFixed(1) + 'x';
+  }
+
+  [elSteer, elAccel, elBrake].forEach(el => {
+    if (el) el.addEventListener('input', updateSettingsUI);
+  });
+
+  document.getElementById('btn-settings').addEventListener('click', () => {
+    const s = Storage.getSettings ? Storage.getSettings() : { steerSens: 1.0, accelSens: 1.0, brakeSens: 1.0 };
+    if (elSteer) elSteer.value = s.steerSens || 1.0;
+    if (elAccel) elAccel.value = s.accelSens || 1.0;
+    if (elBrake) elBrake.value = s.brakeSens || 1.0;
+    updateSettingsUI();
+    UI.showScreen('screen-settings');
+  });
+
+  document.getElementById('settings-back').addEventListener('click', () => {
+    UI.showScreen('screen-home');
+  });
+
+  document.getElementById('btn-save-settings').addEventListener('click', () => {
+    if (Storage.setSettings) {
+      Storage.setSettings({
+        steerSens: parseFloat(elSteer.value),
+        accelSens: parseFloat(elAccel.value),
+        brakeSens: parseFloat(elBrake.value)
+      });
+    }
+    UI.showScreen('screen-home');
   });
 
   // ─── Car Selection ─────────────────────────────────────────
@@ -90,9 +129,30 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.showScreen('screen-home');
   });
 
-  // ─── Global keyboard (pause + race input) ──────────────────
+  // ─── Global keyboard (pause + race + menus) ──────────────────
   document.addEventListener('keydown', e => {
     Game.handleKeyDown(e);
+
+    // Prevent hold-down 'Enter' from skipping across screens
+    if (e.repeat && (e.code === 'Enter' || e.code === 'Space')) return;
+
+    // Menu Navigation
+    if (!Game.isRacing() && !Game.isPaused() && e.code.match(/^(ArrowUp|ArrowDown|ArrowLeft|ArrowRight|KeyW|KeyS|KeyA|KeyD|Enter|Space|Tab)$/)) {
+      if (e.code === 'ArrowUp' || e.code === 'ArrowLeft' || e.code === 'KeyW' || e.code === 'KeyA') {
+        UI.moveFocus(-1);
+        e.preventDefault();
+      } else if (e.code === 'ArrowDown' || e.code === 'ArrowRight' || e.code === 'KeyS' || e.code === 'KeyD' || e.code === 'Tab') {
+        UI.moveFocus(1);
+        e.preventDefault();
+      } else if (e.code === 'Enter' || e.code === 'Space') {
+        UI.clickFocus();
+        if (e.code === 'Space') e.preventDefault();
+      }
+    } else if (Game.isPaused() && e.code.match(/^(ArrowUp|ArrowDown|KeyW|KeyS|Enter|Space|Tab)$/)) {
+      if (e.code === 'ArrowUp' || e.code === 'KeyW') { UI.moveFocus(-1); e.preventDefault(); }
+      else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'Tab') { UI.moveFocus(1); e.preventDefault(); }
+      else if (e.code === 'Enter' || e.code === 'Space') { UI.clickFocus(); if (e.code === 'Space') e.preventDefault(); }
+    }
 
     if ((e.code === 'KeyP' || e.code === 'Escape') && Game.isRacing()) {
       e.preventDefault();
@@ -145,8 +205,14 @@ document.addEventListener('DOMContentLoaded', () => {
       Game.pause();
     }
   }
-  function showPause() { document.getElementById('pause-overlay').style.display = 'flex'; }
-  function hidePause() { document.getElementById('pause-overlay').style.display = 'none'; }
+  function showPause() { 
+    document.getElementById('pause-overlay').style.display = 'flex'; 
+    UI.initKeyboardFocus('#pause-overlay .btn');
+  }
+  function hidePause() { 
+    document.getElementById('pause-overlay').style.display = 'none'; 
+    UI.initKeyboardFocus('');
+  }
 
   // ─── Launch Race ───────────────────────────────────────────
   function launchRace() {
