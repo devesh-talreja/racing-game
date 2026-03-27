@@ -1,5 +1,7 @@
 # Duel Racer
 
+![Duel Racer Gameplay](https://img.shields.io/badge/Status-Beta-brightgreen.svg)
+
 **Duel Racer** is an intensely fast-paced, top-down 1v1 racing game completely built from scratch using pure HTML, CSS, and Vanilla JavaScript. Challenge a brutally adaptive computer driver across 10 radically distinct, mathematically generated track geometries. 
 
 Master the momentum-based drifting physics, razor-thin braking zones, and perfect your racing lines to shave off milliseconds.
