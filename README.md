@@ -1,4 +1,4 @@
-# Duel Racer
+# Duel Racer 🏎
 
 ![Duel Racer Gameplay](https://img.shields.io/badge/Status-Beta-brightgreen.svg)
 
